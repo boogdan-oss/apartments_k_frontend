@@ -26,7 +26,13 @@ const router = createRouter({
       path: '/add-listing',
       name: 'add-listing',
       component: AddListing
-    }
+    },
+    // Додайте це до масиву routes:
+{
+  path: '/property/:id', // :id означає, що тут буде динамічна цифра
+  name: 'Details',
+  component: () => import('../views/Details.vue')
+}
   ]
 })
 

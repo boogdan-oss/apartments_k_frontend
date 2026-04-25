@@ -1,28 +1,47 @@
 import { defineStore } from 'pinia'
 
 export const usePropertyStore = defineStore('property', {
-  state: () => ({
-    // Масив з нашими існуючими квартирами (я скоротив його для прикладу, залиште свої дані)
-    listings: [
-      { id: 1, title: 'Затишна студія', city: 'Київ', type: 'Студія', text: 'Сучасний ремонт.', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80', rating: '4.83', price: '₴18 968 за 2 ночі', ownerName: 'Адміністратор', ownerPhone: '+380000000000' }
-      // ... інші ваші квартири
-    ]
-  }),
-  getters: {
-    getAllListings: (state) => state.listings
+  state: () => {
+    // 1. ЗАВАНТАЖЕННЯ: При старті додатку перевіряємо localStorage
+    const savedListings = localStorage.getItem('my_properties')
+    
+    // Якщо там щось є - розшифровуємо з JSON. Якщо ні - ставимо базовий масив (для прикладу)
+    const initialListings = savedListings 
+      ? JSON.parse(savedListings) 
+      : [
+          { id: 1, title: 'Затишна студія', price: '18 968 ₴', city: 'Київ', type: 'Студія', rating: 4.8, img: '...' },
+          // ... ваші інші дефолтні квартири
+        ]
+
+    return {
+      listings: initialListings,
+      likedIds: [] // (сюди теж можна додати localStorage за бажанням)
+    }
   },
+  
   actions: {
-    // НОВА ФУНКЦІЯ: Додавання оголошення
-    addListing(newListing) {
+    // Функція для додавання нової квартири
+    addProperty(newProperty) {
       // Створюємо унікальний ID для нової квартири
-      const newId = this.listings.length > 0 ? Math.max(...this.listings.map(l => l.id)) + 1 : 1;
+      const newId = this.listings.length > 0 ? Math.max(...this.listings.map(p => p.id)) + 1 : 1;
       
-      // Додаємо нову квартиру на ПОЧАТОК масиву (щоб вона була першою в списку)
-      this.listings.unshift({
+      const propertyToAdd = {
+        ...newProperty,
         id: newId,
-        ...newListing,
-        rating: 'Нове' // Для нових квартир ще немає рейтингу
-      });
+        rating: 0 // Дефолтний рейтинг для нових
+      }
+
+      // Додаємо в масив
+      this.listings.push(propertyToAdd)
+
+      // 2. ЗБЕРЕЖЕННЯ: Одразу записуємо оновлений масив у localStorage
+      this.saveToLocalStorage()
+    },
+
+    // Окрема допоміжна функція для збереження, щоб не писати один і той самий код
+    saveToLocalStorage() {
+      // localStorage розуміє тільки текст, тому перетворюємо масив у JSON-рядок
+      localStorage.setItem('my_properties', JSON.stringify(this.listings))
     }
   }
 })

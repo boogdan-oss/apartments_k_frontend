@@ -134,7 +134,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+// 1. Обов'язково додайте onMounted та watch
+import { ref, computed, onMounted, watch } from 'vue' 
+import axios from 'axios' // 2. Не забудьте імпортувати axios
 import { usePropertyStore } from '../stores/propertyStores'
 import PropertyCard from '../components/property/propertyCard.vue'
 
@@ -150,14 +152,44 @@ const selectedProperty = ref(null)
 const userName = ref('')
 const userPhone = ref('')
 
+// 3. ЗАВАНТАЖУЄМО ДАНІ ПРИ СТАРТІ СТОРІНКИ
+onMounted(async () => {
+  try {
+    // Робимо запит до вашого FastAPI (перевірте, чи правильний шлях /api/listings)
+    const response = await axios.get('http://localhost:8000/api/listings')
+    
+    // Записуємо отримані дані в Сховище (переконайтеся, що масив називається listings)
+    store.listings = response.data
+  } catch (error) {
+    console.error("Помилка завантаження квартир з бекенду:", error)
+  }
+})
+
+// 4. Скидаємо сторінку на 1-шу, якщо користувач почав щось шукати (замість того, щоб робити це в computed)
+watch([searchCity, searchType], () => {
+  currentPage.value = 1
+})
+
 const filteredListings = computed(() => {
-  currentPage.value = 1 
-  return store.getAllListings.filter(item => {
-    const matchCity = searchCity.value === '' || item.city.toLowerCase().includes(searchCity.value.toLowerCase())
-    const matchType = searchType.value === '' || item.type === searchType.value
+  // Зверніть увагу: ми використовуємо store.listings замість store.getAllListings. 
+  // (Якщо у вашому Сховищі масив точно називається listings)
+  const data = store.listings || []
+
+  return data.filter(item => {
+    // Додаємо перевірку, чи взагалі існує item.city, щоб уникнути помилок TypeError
+    const matchCity = searchCity.value === '' || 
+                     (item.city && item.city.toLowerCase().includes(searchCity.value.toLowerCase()))
+    
+    // Додаємо перевірку на 'Будь-який тип', бо він є у вас в HTML
+    const matchType = searchType.value === '' || 
+                      searchType.value === 'Будь-який тип' || 
+                      item.type === searchType.value
+                      
     return matchCity && matchType
   })
 })
+
+// ... далі ваш код (paginatedListings, totalPages, resetFilters і т.д.) залишається без змін! ...
 
 const paginatedListings = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage

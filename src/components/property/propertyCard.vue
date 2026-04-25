@@ -16,7 +16,7 @@
       <p class="card-text text-muted small">{{ property.text }}</p>
       
       <div class="mt-auto d-flex justify-content-between pt-3 border-top">
-        <button class="btn btn-outline-secondary btn-sm" @click="$emit('open-details', property.id)">Деталі</button>
+        <router-link :to="`/property/${property.id}`" class="btn btn-outline-secondary">Деталі</router-link>
         <button class="btn btn-success btn-sm" @click="$emit('open-booking', property)">Забронювати</button>
       </div>
     </div>

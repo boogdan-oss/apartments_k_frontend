@@ -132,10 +132,29 @@ const submitListing = () => {
     ownerName: currentUser.value.name,
     ownerPhone: currentUser.value.phone
   }
+  const handleAdd = async () => {
+  // Очищаємо ціну від пробілів та знаку гривні, залишаємо тільки цифри
+  const cleanPrice = parseFloat(form.value.price.replace(/\D/g, ''))
+
+  const payload = {
+    title: form.value.title,
+    description: form.value.description, // Ваше поле text
+    city: form.value.city,
+    type: form.value.type,
+    img: form.value.imgUrl,
+    area: 50.0,            // Якщо у формі немає площі, поки поставте заглушку або додайте поле
+    price: cleanPrice,     // Тепер це чисте число!
+    room_count: 1,         // Заглушка або додайте поле у форму
+    owner_id: 1            // ТИМЧАСОВО: ID вашого користувача (потім будете брати з токена)
+  }
+
+  // Відправляємо на бекенд...
+  await axios.post('http://localhost:8000/api/listings', payload)
+}
 
   // Імітуємо затримку сервера
   setTimeout(() => {
-    store.addListing(newListing) // Додаємо в Pinia
+    store.addProperty(newListing) // Додаємо в Pinia
     alert('Ваше оголошення успішно опубліковано!')
     router.push('/') // Повертаємо на головну сторінку, щоб побачити його
   }, 1000)
