@@ -156,7 +156,7 @@ const userPhone = ref('')
 onMounted(async () => {
   try {
     // Робимо запит до вашого FastAPI (перевірте, чи правильний шлях /api/listings)
-    const response = await axios.get('http://localhost:8000/api/listings')
+    const response = await axios.get('http://localhost:8000/api/apartments')
     
     // Записуємо отримані дані в Сховище (переконайтеся, що масив називається listings)
     store.listings = response.data
@@ -171,10 +171,10 @@ watch([searchCity, searchType], () => {
 })
 
 const filteredListings = computed(() => {
-  // Зверніть увагу: ми використовуємо store.listings замість store.getAllListings. 
-  // (Якщо у вашому Сховищі масив точно називається listings)
+  
   const data = store.listings || []
-
+// Якщо ви отримуєте список усіх квартир:
+  // listings.value = response.data.filter(item => item.status === 'active')
   return data.filter(item => {
     // Додаємо перевірку, чи взагалі існує item.city, щоб уникнути помилок TypeError
     const matchCity = searchCity.value === '' || 

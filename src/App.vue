@@ -5,26 +5,40 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <router-link to="/" class="nav-link">Головна</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/login" class="nav-link text-success font-weight-bold">Увійти</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/register" class="btn btn-success btn-sm mt-1 ms-2">Реєстрація</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/" class="nav-link">Головна</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/add-listing" class="nav-link text-warning font-weight-bold">
-              <i class="fas fa-plus"></i> Розмістити оголошення
-            </router-link>
-          </li>
-        </ul>
+      <div v-if="authStore.isAuthenticated && authStore.user" class="d-flex align-items-center me-3 text-light">
+        <i class="fas fa-user-circle fa-lg me-2"></i> <span class="font-weight-bold">
+          {{ authStore.user.name }} {{ authStore.user.surname }}
+        </span>
+      </div>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+
+        <template v-if="!authStore.isAuthenticated">
+          <router-link to="/login" class="nav-link text-success">Увійти</router-link>
+          <router-link to="/register" class="btn btn-success auth-btn">Реєстрація</router-link>
+        </template>
+
+        <router-link v-if="authStore.isAuthenticated" to="/profile"
+          class="nav-link text-primary fw-bold me-3 d-flex align-items-center">
+          <i class="fas fa-user-circle fs-5 me-1"></i>
+          <span>Профіль ({{ authStore.user?.name }})</span>
+        </router-link>
+
+        <template v-else>
+          <div v-if="authStore.user" class="text-light">
+            <i class="fas fa-user-circle me-1"></i>
+          </div>
+          <button @click="authStore.logout" class="btn btn-outline-danger auth-btn">Вийти</button>
+        </template>
+
+        <router-link v-if="authStore.isAuthenticated && authStore.user?.role === 'owner'" to="/add-listing"
+          class="nav-link text-warning font-weight-bold">
+          Розмістити оголошення
+        </router-link>
+        <router-link v-if="authStore.isAuthenticated && authStore.user?.role === 'admin'" to="/admin"
+          class="nav-link text-danger font-weight-bold me-3">
+          <i class="fas fa-shield-alt"></i> Адмін-панель
+        </router-link>
+
       </div>
     </nav>
 
@@ -63,6 +77,17 @@
     </footer>
   </div>
 </template>
+<script setup>
+import { onMounted } from 'vue'
+import { useAuthStore } from './stores/authStore' // Вкажіть правильний шлях
+
+const authStore = useAuthStore()
+
+// Коли шапка завантажується, відразу просимо підтягнути дані користувача
+onMounted(() => {
+  authStore.fetchUser()
+})
+</script>
 
 <style>
 /* Компенсуємо висоту меню (navbar fixed-top) */

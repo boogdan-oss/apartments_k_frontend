@@ -52,9 +52,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/authStore' 
 import axios from 'axios'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -83,8 +85,12 @@ const handleLogin = async () => {
     // Якщо успішно - зберігаємо токен
     if (response.data.access_token) {
       localStorage.setItem('token', response.data.access_token)
-      alert('Ви успішно увійшли!')
-      router.push('/') 
+    authStore.token = response.data.access_token // Оновлюємо токен у сторі
+  
+  // ВАЖЛИВО: Відразу викликаємо завантаження профілю!
+  await authStore.fetchUser() 
+  alert("ви успішно увійшли")
+  router.push('/')
     }
 
   } catch (error) {

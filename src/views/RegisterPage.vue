@@ -27,7 +27,7 @@
               <input type="radio" class="btn-check" name="role" id="roleTenant" value="tenant" v-model="form.role">
               <label class="btn btn-outline-success" for="roleTenant">Шукаю житло</label>
 
-              <input type="radio" class="btn-check" name="role" id="roleLandlord" value="landlord" v-model="form.role">
+              <input type="radio" class="btn-check" name="role" id="roleLandlord" value="owner" v-model="form.role">
               <label class="btn btn-outline-success" for="roleLandlord">Здаю житло</label>
             </div>
           </div>

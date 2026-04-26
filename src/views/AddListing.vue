@@ -2,21 +2,22 @@
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        
+
         <div class="card shadow-lg border-0" style="border-radius: 15px;">
           <div class="card-header bg-success text-white p-4" style="border-radius: 15px 15px 0 0;">
             <h3 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Додати нове оголошення</h3>
             <p class="mb-0 small text-light mt-1">Заповніть форму нижче, щоб додати ваш об'єкт у каталог.</p>
           </div>
-          
+
           <div class="card-body p-4 p-md-5">
             <form @submit.prevent="submitListing">
-              
+
               <h5 class="font-weight-bold mb-4 border-bottom pb-2">Основна інформація</h5>
-              
+
               <div class="mb-3">
                 <label class="form-label font-weight-bold small">Заголовок оголошення</label>
-                <input v-model="form.title" type="text" class="form-control" placeholder="Напр. Світла квартира біля метро" required>
+                <input v-model="form.title" type="text" class="form-control"
+                  placeholder="Напр. Світла квартира біля метро" required>
               </div>
 
               <div class="row mb-3">
@@ -35,6 +36,23 @@
                   </select>
                 </div>
               </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Площа (м²)</label>
+                  <input v-model="form.area" type="number" step="0.1" class="form-control" placeholder="Напр. 45.5"
+                    required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Кількість кімнат</label>
+                  <input v-model="form.room_count" type="number" class="form-control" placeholder="Напр. 2" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Вулиця та номер будинку</label>
+                <input v-model="form.street" type="text" class="form-control" placeholder="вул. Соборна, 15" required>
+              </div>
 
               <div class="mb-4">
                 <label class="form-label font-weight-bold small">Ціна (₴ за 2 ночі)</label>
@@ -46,27 +64,24 @@
 
               <div class="mb-4">
                 <label class="form-label font-weight-bold small">Опис об'єкта</label>
-                <textarea v-model="form.text" class="form-control" rows="4" placeholder="Опишіть зручності, розташування, правила проживання..." required></textarea>
+                <textarea v-model="form.text" class="form-control" rows="4"
+                  placeholder="Опишіть зручності, розташування, правила проживання..." required></textarea>
               </div>
 
               <h5 class="font-weight-bold mb-4 border-bottom pb-2">Фотографії</h5>
-              
+
               <div class="mb-4">
                 <label class="form-label small text-muted">Виберіть головне фото для вашого об'єкта</label>
                 <input type="file" class="form-control" accept="image/*" @change="handleImageUpload" required>
-                
+
                 <div v-if="imagePreview" class="mt-3 text-center bg-light p-3 rounded">
                   <p class="small text-muted mb-2">Попередній перегляд:</p>
-                  <img :src="imagePreview" alt="Прев'ю" class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: cover;">
+                  <img :src="imagePreview" alt="Прев'ю" class="img-fluid rounded shadow-sm"
+                    style="max-height: 250px; object-fit: cover;">
                 </div>
               </div>
 
-              <h5 class="font-weight-bold mb-4 border-bottom pb-2">Ваші контактні дані</h5>
-              <div class="bg-light p-3 rounded mb-4">
-                <p class="mb-1"><strong>Ім'я:</strong> {{ currentUser.name }}</p>
-                <p class="mb-1"><strong>Телефон:</strong> {{ currentUser.phone }}</p>
-                <p class="mb-0 small text-muted"><i class="fas fa-info-circle"></i> Ці дані будуть показуватися орендарям для зв'язку з вами.</p>
-              </div>
+
 
               <button type="submit" class="btn btn-success btn-lg w-100" :disabled="isLoading">
                 <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Збереження...</span>
@@ -86,9 +101,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertyStore } from '../stores/propertyStores'
+import { useAuthStore } from '../stores/authStore'
 
 const router = useRouter()
 const store = usePropertyStore()
+const authStore = useAuthStore()
 
 // Імітація даних авторизованого користувача (орендодавця)
 const currentUser = ref({
@@ -102,7 +119,10 @@ const form = ref({
   city: '',
   type: '',
   priceNumber: '',
-  text: ''
+  text: '',
+  area: '',
+  room_count: '',
+  street: ''
 })
 
 const imagePreview = ref(null)
@@ -133,24 +153,45 @@ const submitListing = () => {
     ownerPhone: currentUser.value.phone
   }
   const handleAdd = async () => {
-  // Очищаємо ціну від пробілів та знаку гривні, залишаємо тільки цифри
-  const cleanPrice = parseFloat(form.value.price.replace(/\D/g, ''))
+    // Очищаємо ціну від пробілів та знаку гривні, залишаємо тільки цифри
+    const cleanPrice = parseFloat(form.value.price.replace(/\D/g, ''))
+    try {
+      const payload = {
+        title: form.value.title,
+        description: form.value.description, // Ваше поле text
+        city: form.value.city,
+        type: form.value.type,
+        img: form.value.imgUrl,
+        area: parseFloat(form.value.area),         // Якщо у формі немає площі, поки поставте заглушку або додайте поле
+        price: cleanPrice,
+        room_count: parseInt(form.value.room_count),
+        street: form.value.street,
+        owner_id: authStore.user.id,         // Заглушка або додайте поле у форму
+        address_id: null      // ТИМЧАСОВО: ID вашого користувача (потім будете брати з токена)
+      }
 
-  const payload = {
-    title: form.value.title,
-    description: form.value.description, // Ваше поле text
-    city: form.value.city,
-    type: form.value.type,
-    img: form.value.imgUrl,
-    area: 50.0,            // Якщо у формі немає площі, поки поставте заглушку або додайте поле
-    price: cleanPrice,     // Тепер це чисте число!
-    room_count: 1,         // Заглушка або додайте поле у форму
-    owner_id: 1            // ТИМЧАСОВО: ID вашого користувача (потім будете брати з токена)
+      // Відправляємо на бекенд...
+      const response = await axios.post('http://localhost:8000/api/apartments/', payload, {
+        headers: {
+          Authorization: `Bearer ${authStore.token}` // Передаємо токен, щоб бекенд пустив нас
+        }
+      })
+      alert('Ваше оголошення успішно опубліковано і збережено в базу!')
+      router.push('/') // Перекидаємо на головну
+
+    } catch (error) {
+      console.error("Помилка створення оголошення:", error)
+
+      // Показуємо користувачу, що саме пішло не так
+      if (error.response) {
+        alert("Помилка: " + JSON.stringify(error.response.data.detail))
+      } else {
+        alert("Помилка з'єднання з сервером")
+      }
+    } finally {
+      isLoading.value = false // Вимикаємо індикатор завантаження в будь-якому випадку
+    }
   }
-
-  // Відправляємо на бекенд...
-  await axios.post('http://localhost:8000/api/listings', payload)
-}
 
   // Імітуємо затримку сервера
   setTimeout(() => {
