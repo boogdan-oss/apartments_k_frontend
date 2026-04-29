@@ -139,7 +139,10 @@ import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios' // 2. Не забудьте імпортувати axios
 import { usePropertyStore } from '../stores/propertyStores'
 import PropertyCard from '../components/property/propertyCard.vue'
+import { useAuthStore } from '../stores/authStore'
 
+
+const authStore = useAuthStore()
 const store = usePropertyStore()
 
 const searchCity = ref('')
@@ -189,8 +192,6 @@ const filteredListings = computed(() => {
   })
 })
 
-// ... далі ваш код (paginatedListings, totalPages, resetFilters і т.д.) залишається без змін! ...
-
 const paginatedListings = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   const end = start + itemsPerPage
@@ -214,6 +215,60 @@ const openModal = (property) => {
   selectedProperty.value = property
   isModalOpen.value = true
 }
+const favoriteIds = ref([]) 
+//-----------------------------------------------------------------
+// Завантажуємо список улюблених при відкритті сторінки
+const loadFavorites = async () => {
+  // Завантажуємо тільки якщо це авторизований орендар
+  if (authStore.user?.role === 'tenant') {
+    try {
+      const response = await axios.get('http://localhost:8000/api/apartments/favorites', {
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      })
+      // Зберігаємо тільки ID цих квартир
+      favoriteIds.value = response.data.map(apt => apt.id)
+    } catch (error) {
+      console.error("Не вдалося завантажити вподобайки:", error)
+    }
+  }
+}
+
+// Функція при натисканні на сердечко
+const toggleFavorite = async (apartmentId) => {
+  // Якщо не авторизований або не орендар - нічого не робимо (або можна показати alert)
+  if (authStore.user?.role !== 'tenant') {
+    alert("Тільки орендарі можуть додавати в улюблені!");
+    return;
+  }
+
+  // Перевіряємо, чи ця квартира ВЖЕ в улюблених
+  const isFavorite = favoriteIds.value.includes(apartmentId)
+
+  try {
+    if (isFavorite) {
+      // Якщо вже є - ВИДАЛЯЄМО
+      await axios.delete(`http://localhost:8000/api/apartments/favorites/${apartmentId}`, {
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      })
+      // Прибираємо ID з масиву, щоб сердечко відразу стало порожнім
+      favoriteIds.value = favoriteIds.value.filter(id => id !== apartmentId)
+    } else {
+      // Якщо немає - ДОДАЄМО
+      await axios.post(`http://localhost:8000/api/apartments/favorites/${apartmentId}`, {}, {
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      })
+      // Додаємо ID в масив, щоб сердечко відразу стало червоним
+      favoriteIds.value.push(apartmentId)
+    }
+  } catch (error) {
+    console.error("Помилка зміни статусу вподобайки:", error)
+    alert("Щось пішло не так!")
+  }
+}
+
+// Викликаємо функцію завантаження при старті сторінки (разом з вашим завантаженням квартир)
+onMounted(() => {
+  loadFavorites()
 
 const submitBooking = () => {
   alert(`Дякуємо, ${userName.value}! Заявка на об'єкт "${selectedProperty.value.title}" відправлена. Власник зателефонує вам на номер ${userPhone.value}.`)
@@ -221,4 +276,5 @@ const submitBooking = () => {
   userName.value = ''
   userPhone.value = ''
 }
+})
 </script>

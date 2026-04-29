@@ -3,28 +3,22 @@
     <img :src="property.img" class="card-img-top img-fluid rounded-top" :alt="property.title"
       style="height: 200px; object-fit: cover;">
 
-    <div class="card-body d-flex flex-column flex-grow-1">
-      <!-- <h5 class="card-title text-dark mb-1 font-weight-bold h6">{{ property.title }}</h5>
-      <p class="small text-primary font-weight-bold mb-2">
-        <i class="fas fa-map-marker-alt"></i> {{ property.city }} &bull; {{ property.type }}
-      </p>
+    <div class="card-body d-flex flex-column flex-grow-1 position-relative">
       
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="font-weight-bold">{{ property.price }}</span>
-        <span><i class="fas fa-star text-warning small"></i> {{ property.rating }}</span>
-      </div>
-      
-      <p class="card-text text-muted small">{{ property.text }}</p> -->
-      <div class="card-body">
+      <button v-if="authStore.user?.role === 'tenant'" @click="$emit('toggle-favorite', property.id)"
+        class="btn btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+        style="z-index: 10; border: none; background: white; transform: translateY(-200px);"> <i :class="favoriteIds.includes(property.id) ? 'fas fa-heart text-danger' : 'far fa-heart text-secondary'"></i>
+      </button>
+      <div class="card-body p-0 pt-2">
         <h5 class="card-title">{{ property.title }}</h5>
-
+        
         <p class="text-muted small mb-1">
           <i class="fas fa-expand"></i> {{ property.area }} м² |
           <i class="fas fa-door-open"></i> {{ property.room_count }} кімн.
         </p>
 
         <p class="small text-primary mb-2">
-          <i class="fas fa-map-marker-alt"></i> {{ property.city }}, {{ property.street }}
+          <i class="fas fa-map-marker-alt"></i> {{ property.city }}
         </p>
 
         <h6 class="text-success font-weight-bold">{{ property.price }} грн</h6>
@@ -39,12 +33,25 @@
 </template>
 
 <script setup>
+
+import { useAuthStore } from '../../stores/authStore'
+
+const authStore = useAuthStore()
+
+// 2. ОГОЛОШУЄМО PROPS (Те, що картка отримує від головної сторінки)
 defineProps({
   property: {
     type: Object,
     required: true
+  },
+  favoriteIds: {
+    type: Array,
+    default: () => [] // За замовчуванням порожній масив
   }
 })
+
+// 3. ОГОЛОШУЄМО EMITS (Те, що картка "кричить" головній сторінці зробити)
+defineEmits(['open-booking', 'toggle-favorite'])
 </script>
 
 <style scoped>

@@ -100,18 +100,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePropertyStore } from '../stores/propertyStores'
 import { useAuthStore } from '../stores/authStore'
+import axios from 'axios' // <--- ДОДАНО ОБОВ'ЯЗКОВИЙ ІМПОРТ AXIOS
 
 const router = useRouter()
-const store = usePropertyStore()
 const authStore = useAuthStore()
-
-// Імітація даних авторизованого користувача (орендодавця)
-const currentUser = ref({
-  name: 'Олександр Власник',
-  phone: '+38 (067) 999-88-77'
-})
 
 // Дані форми
 const form = ref({
@@ -122,7 +115,7 @@ const form = ref({
   text: '',
   area: '',
   room_count: '',
-  street: ''
+  status: 'active'
 })
 
 const imagePreview = ref(null)
@@ -132,72 +125,54 @@ const isLoading = ref(false)
 const handleImageUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    // Створюємо тимчасове локальне посилання на файл, щоб показати прев'ю
     imagePreview.value = URL.createObjectURL(file)
   }
 }
 
-// Функція відправки форми
-const submitListing = () => {
+// Функція відправки форми (Без зайвих матрьошок!)
+const submitListing = async () => {
+  console.log("Кнопка натиснута! Функція запустилася!");
   isLoading.value = true
 
-  // Формуємо фінальний об'єкт так, як очікує наше сховище
-  const newListing = {
-    title: form.value.title,
-    city: form.value.city,
-    type: form.value.type,
-    text: form.value.text,
-    price: `₴${form.value.priceNumber} за 2 ночі`,
-    img: imagePreview.value || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80', // Якщо фото немає, ставимо заглушку
-    ownerName: currentUser.value.name,
-    ownerPhone: currentUser.value.phone
-  }
-  const handleAdd = async () => {
-    // Очищаємо ціну від пробілів та знаку гривні, залишаємо тільки цифри
-    const cleanPrice = parseFloat(form.value.price.replace(/\D/g, ''))
-    try {
-      const payload = {
-        title: form.value.title,
-        description: form.value.description, // Ваше поле text
-        city: form.value.city,
-        type: form.value.type,
-        img: form.value.imgUrl,
-        area: parseFloat(form.value.area),         // Якщо у формі немає площі, поки поставте заглушку або додайте поле
-        price: cleanPrice,
-        room_count: parseInt(form.value.room_count),
-        street: form.value.street,
-        owner_id: authStore.user.id,         // Заглушка або додайте поле у форму
-        address_id: null      // ТИМЧАСОВО: ID вашого користувача (потім будете брати з токена)
-      }
-
-      // Відправляємо на бекенд...
-      const response = await axios.post('http://localhost:8000/api/apartments/', payload, {
-        headers: {
-          Authorization: `Bearer ${authStore.token}` // Передаємо токен, щоб бекенд пустив нас
-        }
-      })
-      alert('Ваше оголошення успішно опубліковано і збережено в базу!')
-      router.push('/') // Перекидаємо на головну
-
-    } catch (error) {
-      console.error("Помилка створення оголошення:", error)
-
-      // Показуємо користувачу, що саме пішло не так
-      if (error.response) {
-        alert("Помилка: " + JSON.stringify(error.response.data.detail))
-      } else {
-        alert("Помилка з'єднання з сервером")
-      }
-    } finally {
-      isLoading.value = false // Вимикаємо індикатор завантаження в будь-якому випадку
+  try {
+    // 1. Формуємо об'єкт рівно так, як чекає бекенд
+    const payload = {
+      title: form.value.title,
+      description: form.value.text, // Беремо текст з форми
+      city: form.value.city,
+      type: form.value.type,
+      img: imagePreview.value || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80',
+      area: parseFloat(form.value.area) || 0, // Додано || 0 на випадок порожнього поля
+      price: parseFloat(form.value.priceNumber) || 0,
+      room_count: parseInt(form.value.room_count) || 1,
+      owner_id: authStore.user.id,
+      address_id: 1,
+      status: form.value.status 
     }
-  }
+    
+    console.log("Дані зібрані, відправляю на бекенд:", payload);
 
-  // Імітуємо затримку сервера
-  setTimeout(() => {
-    store.addProperty(newListing) // Додаємо в Pinia
-    alert('Ваше оголошення успішно опубліковано!')
-    router.push('/') // Повертаємо на головну сторінку, щоб побачити його
-  }, 1000)
+    // 2. Робимо реальний запит на бекенд
+    const response = await axios.post('http://localhost:8000/api/apartments/', payload, {
+      headers: {
+        Authorization: `Bearer ${authStore.token}` 
+      }
+    })
+
+    // 3. Якщо все успішно:
+    alert('Ваше оголошення успішно опубліковано і збережено в базу!')
+    router.push('/') 
+
+  } catch (error) {
+    console.error("Помилка створення оголошення:", error)
+    // Якщо бекенд відбив запит, показуємо чому:
+    if (error.response) {
+      alert("Помилка: " + JSON.stringify(error.response.data.detail || error.response.data))
+    } else {
+      alert("Помилка з'єднання з сервером")
+    }
+  } finally {
+    isLoading.value = false 
+  }
 }
 </script>

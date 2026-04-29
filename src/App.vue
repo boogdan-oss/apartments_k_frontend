@@ -16,6 +16,9 @@
           <router-link to="/login" class="nav-link text-success">Увійти</router-link>
           <router-link to="/register" class="btn btn-success auth-btn">Реєстрація</router-link>
         </template>
+        <button @click="authStore.logout()" class="btn btn-outline-danger btn-sm">
+          Вийти
+        </button>
 
         <router-link v-if="authStore.isAuthenticated" to="/profile"
           class="nav-link text-primary fw-bold me-3 d-flex align-items-center">
@@ -23,11 +26,13 @@
           <span>Профіль ({{ authStore.user?.name }})</span>
         </router-link>
 
-        <template v-else>
+        <template>
           <div v-if="authStore.user" class="text-light">
             <i class="fas fa-user-circle me-1"></i>
           </div>
-          <button @click="authStore.logout" class="btn btn-outline-danger auth-btn">Вийти</button>
+          <button v-if="authStore.isAuthenticated" @click="authStore.logout()" class="btn btn-outline-danger btn-sm">
+            Вийти
+          </button>
         </template>
 
         <router-link v-if="authStore.isAuthenticated && authStore.user?.role === 'owner'" to="/add-listing"
@@ -79,18 +84,18 @@
 </template>
 <script setup>
 import { onMounted } from 'vue'
-import { useAuthStore } from './stores/authStore' // Вкажіть правильний шлях
+import { useAuthStore } from './stores/authStore'
 
 const authStore = useAuthStore()
 
-// Коли шапка завантажується, відразу просимо підтягнути дані користувача
+
 onMounted(() => {
   authStore.fetchUser()
 })
 </script>
 
 <style>
-/* Компенсуємо висоту меню (navbar fixed-top) */
+
 body {
   padding-top: 56px;
   background-color: #f8f9fa;
@@ -99,7 +104,7 @@ body {
   flex-direction: column;
 }
 
-/* Якщо ви хочете, щоб футер завжди був притиснутий до низу сторінки */
+
 #app {
   display: flex;
   flex-direction: column;
