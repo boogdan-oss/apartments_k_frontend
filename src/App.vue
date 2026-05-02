@@ -35,14 +35,15 @@
           </button>
         </template>
 
-        <router-link v-if="authStore.isAuthenticated && authStore.user?.role === 'owner'" to="/add-listing"
+        <router-link v-if="authStore.isAuthenticated " to="/add-listing"
           class="nav-link text-warning font-weight-bold">
           Розмістити оголошення
         </router-link>
-        <router-link v-if="authStore.isAuthenticated && authStore.user?.role === 'admin'" to="/admin"
-          class="nav-link text-danger font-weight-bold me-3">
-          <i class="fas fa-shield-alt"></i> Адмін-панель
-        </router-link>
+        <!-- Кнопка "База даних", яку бачить ТІЛЬКИ admin -->
+        <a v-if="authStore.user?.role === 'admin'" href="http://localhost:8000/admin" target="_blank"
+          class="nav-link text-danger fw-bold me-3">
+          <i class="fas fa-database"></i> База даних (SQLAdmin)
+        </a>
 
       </div>
     </nav>
@@ -62,7 +63,7 @@
             <ul class="list-unstyled text-muted small">
               <li class="mb-2"><router-link to="/" class="text-muted text-decoration-none">Головна
                   сторінка</router-link></li>
-              <li class="mb-2"><a href="#" class="text-success text-decoration-none">Розмістити оголошення</a></li>
+
             </ul>
           </div>
           <div class="col-md-4">
@@ -95,7 +96,6 @@ onMounted(() => {
 </script>
 
 <style>
-
 body {
   padding-top: 56px;
   background-color: #f8f9fa;

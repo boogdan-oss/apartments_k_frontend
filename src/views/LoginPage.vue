@@ -25,7 +25,7 @@
           <div class="form-group mb-4">
             <div class="d-flex justify-content-between">
               <label class="form-label font-weight-bold small">Пароль</label>
-              <a href="#" class="small text-success text-decoration-none">Забули пароль?</a>
+             
             </div>
             <div class="input-group">
               <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
@@ -68,10 +68,10 @@ const handleLogin = async () => {
   serverError.value = ''
 
   try {
-    // 1. Для OAuth2 у FastAPI ми зобов'язані використовувати URLSearchParams
+   
     const formData = new URLSearchParams()
     
-    // 2. Зверніть увагу: сервер чекає ключ "username", навіть якщо ми передаємо туди email
+    
     formData.append('username', email.value) 
     formData.append('password', password.value)
 

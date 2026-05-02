@@ -111,5 +111,24 @@ onMounted(async () => {
     } finally {
         isLoading.value = false
     }
+
+    const favoriteApartments = ref([])
+
+const loadMyFavorites = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/apartments/favorites', {
+      headers: { Authorization: `Bearer ${authStore.token}` }
+    })
+    favoriteApartments.value = response.data
+  } catch (error) {
+    console.error("Помилка завантаження:", error)
+  }
+}
+
+onMounted(() => {
+  if (authStore.user?.role === 'tenant') {
+    loadMyFavorites()
+  }
+})
 })
 </script>

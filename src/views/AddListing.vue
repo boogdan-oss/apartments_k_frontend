@@ -122,10 +122,33 @@ const imagePreview = ref(null)
 const isLoading = ref(false)
 
 // Функція обробки завантаження фото
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    imagePreview.value = URL.createObjectURL(file)
+// Функція, яка спрацьовує, коли ви обираєте файл з комп'ютера
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Для відправки файлів використовується FormData
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    // 1. Відправляємо файл на наш новий роут
+    const res = await axios.post('http://localhost:8000/api/images/upload-image/', formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${authStore.token}` // якщо роут захищений
+      }
+    });
+
+    // 2. Бекенд повернув нам вічне посилання! 
+    // Записуємо його в об'єкт квартири замість blob:
+    apartmentData.value.img = res.data.img_url; 
+    
+    console.log("Фото успішно завантажено:", apartmentData.value.img);
+
+  } catch (error) {
+    console.error("Помилка завантаження картинки:", error);
+    alert("Не вдалося завантажити фото");
   }
 }
 
@@ -158,6 +181,9 @@ const submitListing = async () => {
         Authorization: `Bearer ${authStore.token}` 
       }
     })
+    if (authStore.user) {
+        authStore.user.role = 'owner'
+    }
 
     // 3. Якщо все успішно:
     alert('Ваше оголошення успішно опубліковано і збережено в базу!')

@@ -4,29 +4,36 @@
       style="height: 200px; object-fit: cover;">
 
     <div class="card-body d-flex flex-column flex-grow-1 position-relative">
-      
-      <button v-if="authStore.user?.role === 'tenant'" @click="$emit('toggle-favorite', property.id)"
-        class="btn btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
-        style="z-index: 10; border: none; background: white; transform: translateY(-200px);"> <i :class="favoriteIds.includes(property.id) ? 'fas fa-heart text-danger' : 'far fa-heart text-secondary'"></i>
-      </button>
-      <div class="card-body p-0 pt-2">
-        <h5 class="card-title">{{ property.title }}</h5>
-        
-        <p class="text-muted small mb-1">
-          <i class="fas fa-expand"></i> {{ property.area }} м² |
-          <i class="fas fa-door-open"></i> {{ property.room_count }} кімн.
-        </p>
 
-        <p class="small text-primary mb-2">
-          <i class="fas fa-map-marker-alt"></i> {{ property.city }}
-        </p>
+      <div class="card h-100 shadow-sm border-0 position-relative">
 
-        <h6 class="text-success font-weight-bold">{{ property.price }} грн</h6>
-      </div>
+        <button v-if="authStore.user?.role === 'tenant'" @click.stop="$emit('toggle-favorite', property.id)"
+          class="btn position-absolute top-0 end-0 m-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+          style="z-index: 10; background: white; width: 35px; height: 35px; border: none;">
+          <i
+            :class="favoriteIds.includes(property.id) ? 'fas fa-heart text-danger' : 'far fa-heart text-secondary'"></i>
+        </button>
 
-      <div class="mt-auto d-flex justify-content-between pt-3 border-top">
-        <router-link :to="`/property/${property.id}`" class="btn btn-outline-secondary">Деталі</router-link>
-        <button class="btn btn-success btn-sm" @click="$emit('open-booking', property)">Забронювати</button>
+        <img :src="property.img" class="card-img-top..." alt="...">
+        <div class="card-body p-0 pt-2">
+          <h5 class="card-title">{{ property.title }}</h5>
+
+          <p class="text-muted small mb-1">
+            <i class="fas fa-expand"></i> {{ property.area }} м² |
+            <i class="fas fa-door-open"></i> {{ property.room_count }} кімн.
+          </p>
+
+          <p class="small text-primary mb-2">
+            <i class="fas fa-map-marker-alt"></i> {{ property.city }}
+          </p>
+
+          <h6 class="text-success font-weight-bold">{{ property.price }} грн</h6>
+        </div>
+
+        <div class="mt-auto d-flex justify-content-between pt-3 border-top">
+          <router-link :to="`/property/${property.id}`" class="btn btn-outline-secondary">Деталі</router-link>
+          <button class="btn btn-success btn-sm" @click="$emit('open-booking', property)">Забронювати</button>
+        </div>
       </div>
     </div>
   </div>

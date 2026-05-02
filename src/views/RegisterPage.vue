@@ -21,7 +21,7 @@
             <i class="fas fa-exclamation-triangle me-1"></i> {{ serverError }}
           </div>
           
-          <div class="mb-4 text-center">
+          <!-- <div class="mb-4 text-center">
             <label class="d-block mb-2 font-weight-bold small">Хто ви?</label>
             <div class="btn-group w-100" style="max-width: 400px;">
               <input type="radio" class="btn-check" name="role" id="roleTenant" value="tenant" v-model="form.role">
@@ -30,7 +30,7 @@
               <input type="radio" class="btn-check" name="role" id="roleLandlord" value="owner" v-model="form.role">
               <label class="btn btn-outline-success" for="roleLandlord">Здаю житло</label>
             </div>
-          </div>
+          </div> -->
 
           <div class="row mb-3">
             <div class="col-md-6">
@@ -80,7 +80,7 @@
           <div class="form-check mb-4">
             <input v-model="form.terms" class="form-check-input" type="checkbox" id="termsCheck" required>
             <label class="form-check-label small" for="termsCheck">
-              Я погоджуюсь з <a href="#" class="text-success">Правилами сервісу</a>.
+              Я погоджуюсь з <router-link to="/terms">Правила сервісу</router-link>
             </label>
           </div>
 

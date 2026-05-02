@@ -7,6 +7,7 @@ import AdminPage from "../views/AdminPage.vue";
 import profilePage from "../views/profilePage.vue";
 import editListing from "../views/editListing.vue";
 import contractPage from "../views/contractPage.vue";
+import TermsPage from "../views/TermsPage.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -52,6 +53,11 @@ const router = createRouter({
       component: () => import("../views/Details.vue"),
     },
     { path: "/create-contract/:id", component: contractPage },
+    {
+    path: '/terms',
+    name: 'Terms',
+    component: TermsPage
+  }
   ],
 });
 
