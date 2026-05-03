@@ -69,7 +69,7 @@
               </div>
 
               <h5 class="font-weight-bold mb-4 border-bottom pb-2">Фотографії</h5>
-
+              <!-- 
               <div class="mb-4">
                 <label class="form-label small text-muted">Виберіть головне фото для вашого об'єкта</label>
                 <input type="file" class="form-control" accept="image/*" @change="handleImageUpload" required>
@@ -79,6 +79,15 @@
                   <img :src="imagePreview" alt="Прев'ю" class="img-fluid rounded shadow-sm"
                     style="max-height: 250px; object-fit: cover;">
                 </div>
+              </div> -->
+              <div class="mb-3">
+                <label class="form-label">Фотографія квартири</label>
+                <!-- ДОДАЄМО @change СЮДИ: -->
+                <input type="file" class="form-control" accept="image/*" @change="handleImageUpload">
+
+                <!-- Для краси: показуємо прев'ю, якщо фото вже завантажилось -->
+                <img v-if="form.img" :src="form.img" alt="Прев'ю" class="mt-2"
+                  style="max-height: 150px; border-radius: 8px;">
               </div>
 
 
@@ -113,6 +122,7 @@ const form = ref({
   type: '',
   priceNumber: '',
   text: '',
+  img:'',
   area: '',
   room_count: '',
   status: 'active'
@@ -134,7 +144,7 @@ const handleImageUpload = async (event) => {
   try {
     // 1. Відправляємо файл на наш новий роут
     const res = await axios.post('http://localhost:8000/api/images/upload-image/', formData, {
-      headers: { 
+      headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${authStore.token}` // якщо роут захищений
       }
@@ -142,9 +152,9 @@ const handleImageUpload = async (event) => {
 
     // 2. Бекенд повернув нам вічне посилання! 
     // Записуємо його в об'єкт квартири замість blob:
-    apartmentData.value.img = res.data.img_url; 
-    
-    console.log("Фото успішно завантажено:", apartmentData.value.img);
+    form.value.img = res.data.img_url;
+
+    console.log("Фото успішно завантажено:", form.value.img);
 
   } catch (error) {
     console.error("Помилка завантаження картинки:", error);
@@ -164,30 +174,30 @@ const submitListing = async () => {
       description: form.value.text, // Беремо текст з форми
       city: form.value.city,
       type: form.value.type,
-      img: imagePreview.value || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80',
+      img: form.value.img || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80',
       area: parseFloat(form.value.area) || 0, // Додано || 0 на випадок порожнього поля
       price: parseFloat(form.value.priceNumber) || 0,
       room_count: parseInt(form.value.room_count) || 1,
       owner_id: authStore.user.id,
       address_id: 1,
-      status: form.value.status 
+      status: form.value.status
     }
-    
+
     console.log("Дані зібрані, відправляю на бекенд:", payload);
 
     // 2. Робимо реальний запит на бекенд
     const response = await axios.post('http://localhost:8000/api/apartments/', payload, {
       headers: {
-        Authorization: `Bearer ${authStore.token}` 
+        Authorization: `Bearer ${authStore.token}`
       }
     })
     if (authStore.user) {
-        authStore.user.role = 'owner'
+      authStore.user.role = 'owner'
     }
 
     // 3. Якщо все успішно:
     alert('Ваше оголошення успішно опубліковано і збережено в базу!')
-    router.push('/') 
+    router.push('/')
 
   } catch (error) {
     console.error("Помилка створення оголошення:", error)
@@ -198,7 +208,7 @@ const submitListing = async () => {
       alert("Помилка з'єднання з сервером")
     }
   } finally {
-    isLoading.value = false 
+    isLoading.value = false
   }
 }
 </script>

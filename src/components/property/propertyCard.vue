@@ -7,12 +7,13 @@
 
       <div class="card h-100 shadow-sm border-0 position-relative">
 
-        <button v-if="authStore.user?.role === 'tenant'" @click.stop="$emit('toggle-favorite', property.id)"
-          class="btn position-absolute top-0 end-0 m-2 rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-          style="z-index: 10; background: white; width: 35px; height: 35px; border: none;">
-          <i
-            :class="favoriteIds.includes(property.id) ? 'fas fa-heart text-danger' : 'far fa-heart text-secondary'"></i>
-        </button>
+        <!-- Кнопка Вподобайки -->
+       <button @click="$emit('toggleFavorite', property.id)"
+          class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm"
+          style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: 0.2s;">
+         
+          <i class="far-heart far-lg" :class="isFav ? 'fas text-danger' : 'far text-secondary'"></i>
+        </button> 
 
         <img :src="property.img" class="card-img-top..." alt="...">
         <div class="card-body p-0 pt-2">
@@ -46,19 +47,27 @@ import { useAuthStore } from '../../stores/authStore'
 const authStore = useAuthStore()
 
 // 2. ОГОЛОШУЄМО PROPS (Те, що картка отримує від головної сторінки)
+// defineProps({
+//   property: {
+//     type: Object,
+//     required: true,
+//     isFav: Boolean
+//   },
+//   favoriteIds: {
+//     type: Array,
+//     default: () => [] // За замовчуванням порожній масив
+//   }
+// })
+
+// // 3. ОГОЛОШУЄМО EMITS (Те, що картка "кричить" головній сторінці зробити)
+// defineEmits(['open-booking', 'toggle-favorite'])
 defineProps({
-  property: {
-    type: Object,
-    required: true
-  },
-  favoriteIds: {
-    type: Array,
-    default: () => [] // За замовчуванням порожній масив
-  }
+    property: Object,
+    isFav: Boolean // <--- ОСЬ ЦЕ ОБОВ'ЯЗКОВО ТРЕБА ДОДАТИ!
 })
 
-// 3. ОГОЛОШУЄМО EMITS (Те, що картка "кричить" головній сторінці зробити)
-defineEmits(['open-booking', 'toggle-favorite'])
+// 2. Додаємо toggleFavorite, щоб картка мала дозвіл "кричати" наверх про клік
+defineEmits(['openBooking', 'toggleFavorite'])
 </script>
 
 <style scoped>

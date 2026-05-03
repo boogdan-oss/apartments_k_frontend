@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', {
     const response = await axios.get('http://localhost:8000/api/auth/me', {
       headers: { Authorization: `Bearer ${this.token}` }
     })
-    console.log("Дані користувача отримано:", response.data) // Додайте це!
+    console.log("Дані користувача отримано:", response.data) 
     this.user = response.data
   } catch (error) {
     console.error("Сервер не віддав профіль:", error.response?.data)

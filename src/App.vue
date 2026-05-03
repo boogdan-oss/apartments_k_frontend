@@ -20,7 +20,7 @@
           Вийти
         </button>
 
-        <router-link v-if="authStore.isAuthenticated" to="/profile"
+        <router-link v-if="authStore.isAuthenticated " to="/profile"
           class="nav-link text-primary fw-bold me-3 d-flex align-items-center">
           <i class="fas fa-user-circle fs-5 me-1"></i>
           <span>Профіль ({{ authStore.user?.name }})</span>
@@ -109,5 +109,12 @@ body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+footer {
+  
+  padding: 10px 0; /* Зробіть його меншим */
+  background-color: #333; 
+  /* ... ваші інші стилі ... */
 }
 </style>

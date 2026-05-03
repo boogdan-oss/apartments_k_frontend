@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="jumbotron jumbotron-fluid text-white text-center mb-0" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover; padding: 100px 0;">
+    <div class="jumbotron jumbotron-fluid text-white text-center mb-0"
+      style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover; padding: 100px 0;">
       <div class="container">
         <h1 class="display-4 font-weight-bold">Знайдіть ідеальне житло</h1>
         <p class="lead">Більше 10 000 перевірених квартир та будинків по всій Україні.</p>
@@ -32,19 +33,20 @@
 
     <div class="container-fluid py-5 bg-light" id="catalogSection">
       <div class="row px-md-3">
-        
+
         <div class="col-lg-3 mb-4">
           <div class="card shadow-sm border-0 sticky-top" style="top: 80px; z-index: 10;">
             <div class="card-body">
               <h5 class="card-title mb-4"><i class="fas fa-filter"></i> Фільтри</h5>
-              
+
               <div class="form-group">
                 <label class="font-weight-bold small">Місто або район</label>
                 <div class="input-group">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
                   </div>
-                  <input v-model="searchCity" type="text" class="form-control border-left-0 pl-0" placeholder="Напр. Київ">
+                  <input v-model="searchCity" type="text" class="form-control border-left-0 pl-0"
+                    placeholder="Напр. Київ">
                 </div>
               </div>
 
@@ -71,10 +73,8 @@
 
           <div v-if="paginatedListings.length > 0" class="row">
             <div class="col-md-6 col-xl-4 mb-4" v-for="item in paginatedListings" :key="item.id">
-              <PropertyCard 
-                :property="item"
-                @open-booking="openModal"
-              />
+              <PropertyCard :property="item" :isFav="isFavorite(item.id)" @toggleFavorite="toggleFavorite"
+                @openBooking="openModal" />
             </div>
           </div>
 
@@ -135,7 +135,7 @@
 
 <script setup>
 // 1. Обов'язково додайте onMounted та watch
-import { ref, computed, onMounted, watch } from 'vue' 
+import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios' // 2. Не забудьте імпортувати axios
 import { usePropertyStore } from '../stores/propertyStores'
 import PropertyCard from '../components/property/propertyCard.vue'
@@ -148,7 +148,7 @@ const store = usePropertyStore()
 const searchCity = ref('')
 const searchType = ref('')
 const currentPage = ref(1)
-const itemsPerPage = 6 
+const itemsPerPage = 6
 
 const isModalOpen = ref(false)
 const selectedProperty = ref(null)
@@ -160,7 +160,7 @@ onMounted(async () => {
   try {
     // Робимо запит до вашого FastAPI (перевірте, чи правильний шлях /api/listings)
     const response = await axios.get('http://localhost:8000/api/apartments')
-    
+
     // Записуємо отримані дані в Сховище (переконайтеся, що масив називається listings)
     store.listings = response.data
   } catch (error) {
@@ -174,20 +174,19 @@ watch([searchCity, searchType], () => {
 })
 
 const filteredListings = computed(() => {
-  
+
   const data = store.listings || []
-// Якщо ви отримуєте список усіх квартир:
-  // listings.value = response.data.filter(item => item.status === 'active')
+
   return data.filter(item => {
     // Додаємо перевірку, чи взагалі існує item.city, щоб уникнути помилок TypeError
-    const matchCity = searchCity.value === '' || 
-                     (item.city && item.city.toLowerCase().includes(searchCity.value.toLowerCase()))
-    
+    const matchCity = searchCity.value === '' ||
+      (item.city && item.city.toLowerCase().includes(searchCity.value.toLowerCase()))
+
     // Додаємо перевірку на 'Будь-який тип', бо він є у вас в HTML
-    const matchType = searchType.value === '' || 
-                      searchType.value === 'Будь-який тип' || 
-                      item.type === searchType.value
-                      
+    const matchType = searchType.value === '' ||
+      searchType.value === 'Будь-який тип' ||
+      item.type === searchType.value
+
     return matchCity && matchType
   })
 })
@@ -215,12 +214,16 @@ const openModal = (property) => {
   selectedProperty.value = property
   isModalOpen.value = true
 }
-const favoriteIds = ref([]) 
+
 //-----------------------------------------------------------------
+const favoriteIds = ref([])
+
+// 2. ФУНКЦІЯ ПЕРЕВІРКИ (Саме її зараз шукає і не може знайти Vue!)
+const isFavorite = (id) => favoriteIds.value.includes(id)
 // Завантажуємо список улюблених при відкритті сторінки
 const loadFavorites = async () => {
   // Завантажуємо тільки якщо це авторизований орендар
-  if (authStore.user?.role === 'tenant') {
+  if (!authStore.user?.role === 'admin') {
     try {
       const response = await axios.get('http://localhost:8000/api/apartments/favorites', {
         headers: { Authorization: `Bearer ${authStore.token}` }
@@ -236,10 +239,7 @@ const loadFavorites = async () => {
 // Функція при натисканні на сердечко
 const toggleFavorite = async (apartmentId) => {
   // Якщо не авторизований або не орендар - нічого не робимо (або можна показати alert)
-  if (authStore.user?.role !== 'tenant') {
-    alert("Тільки орендарі можуть додавати в улюблені!");
-    return;
-  }
+ 
 
   // Перевіряємо, чи ця квартира ВЖЕ в улюблених
   const isFavorite = favoriteIds.value.includes(apartmentId)
@@ -270,11 +270,11 @@ const toggleFavorite = async (apartmentId) => {
 onMounted(() => {
   loadFavorites()
 
-const submitBooking = () => {
-  alert(`Дякуємо, ${userName.value}! Заявка на об'єкт "${selectedProperty.value.title}" відправлена. Власник зателефонує вам на номер ${userPhone.value}.`)
-  isModalOpen.value = false
-  userName.value = ''
-  userPhone.value = ''
-}
+  const submitBooking = () => {
+    alert(`Дякуємо, ${userName.value}! Заявка на об'єкт "${selectedProperty.value.title}" відправлена. Власник зателефонує вам на номер ${userPhone.value}.`)
+    isModalOpen.value = false
+    userName.value = ''
+    userPhone.value = ''
+  }
 })
 </script>
