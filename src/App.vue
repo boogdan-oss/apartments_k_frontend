@@ -39,10 +39,10 @@
           class="nav-link text-warning font-weight-bold">
           Розмістити оголошення
         </router-link>
-        <!-- Кнопка "База даних", яку бачить ТІЛЬКИ admin -->
+        
         <a v-if="authStore.user?.role === 'admin'" href="http://localhost:8000/admin" target="_blank"
           class="nav-link text-danger fw-bold me-3">
-          <i class="fas fa-database"></i> База даних (SQLAdmin)
+          <i class="fas fa-database"></i> адмін панель (SQLAdmin)
         </a>
 
       </div>
@@ -50,33 +50,47 @@
 
     <router-view />
 
-    <footer class="bg-dark text-white py-5 mt-auto">
+    <footer class="bg-dark text-white py-3 mt-2">
       <div class="container">
-        <div class="row">
-          <div class="col-md-4 mb-4 mb-md-0">
-            <h5 class="font-weight-bold"><i class="fas fa-home text-success"></i> ТвійДім</h5>
-            <p class="text-muted small mt-3 pr-md-4">Ваш надійний партнер у пошуку ідеального житла для оренди по всій
-              Україні.</p>
+        <div class="row text-center">
+ 
+          <div class="col-md-4 mb-3 mb-md-0">
+            <h6 class="fw-bold"><i class="fas fa-home text-success"></i> ТвійДім</h6>
+            <p class="text small mt-2">Ваш надійний партнер у пошуку ідеального житла для оренди по всій Україні.</p>
+            <router-link to="/terms" class="text small text-decoration-none">
+              <i class="fas fa-file-alt me-1"></i> Правила сервісу
+            </router-link>
           </div>
-          <div class="col-md-4 mb-4 mb-md-0">
-            <h5 class="font-weight-bold mb-3">Навігація</h5>
+ 
+          <div class="col-md-4 mb-3 mb-md-0">
+            <h6 class="fw-bold mb-2">Навігація</h6>
             <ul class="list-unstyled text-muted small">
-              <li class="mb-2"><router-link to="/" class="text-muted text-decoration-none">Головна
-                  сторінка</router-link></li>
-
+              <li class="mb-1">
+                <router-link to="/" class="text text-decoration-none">Головна сторінка</router-link>
+              </li>
             </ul>
           </div>
+ 
           <div class="col-md-4">
-            <h5 class="font-weight-bold mb-3">Контакти</h5>
-            <ul class="list-unstyled text-muted small">
-              <li class="mb-2"><i class="fas fa-phone-alt mr-2"></i> +38 (099) 123-45-67</li>
-              <li class="mb-2"><i class="fas fa-envelope mr-2"></i> support@tviydim.ua</li>
+            <h6 class="fw-bold mb-2">Контакти</h6>
+            <ul class="list-unstyled text small">
+              <li class="mb-1"><i class="fas fa-phone-alt me-1"></i> +38 (099) 123-45-67</li>
+              
+              <!-- ✅ Додано контакт -->
+              <li class="mb-1">
+                <i class="fab fa-telegram me-1 text-info"></i>
+                Ткачук Богдан —
+                <a href="https://t.me/Bbogdanchickk" target="_blank" class="text-info text-decoration-none">@Bbogdanchickk</a>
+              </li>
+              <li class="mb-1"><i class="fas fa-phone-alt me-1"></i> Група ПІ-232</li>
             </ul>
           </div>
+ 
         </div>
-        <div class="row mt-4 pt-4 border-top border-secondary text-center">
+ 
+        <div class="row mt-3 pt-2 border-top border-secondary text-center">
           <div class="col-12">
-            <p class="small text-muted mb-0">&copy; 2026 ТвійДім. Всі права захищені.</p>
+            <p class="small text mb-0">&copy; 2026 ТвійДім. Всі права захищені.</p>
           </div>
         </div>
       </div>
@@ -115,6 +129,7 @@ footer {
   
   padding: 10px 0; /* Зробіть його меншим */
   background-color: #333; 
-  /* ... ваші інші стилі ... */
+  text-decoration-color:aliceblue;
+  
 }
 </style>

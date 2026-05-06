@@ -21,16 +21,7 @@
             <i class="fas fa-exclamation-triangle me-1"></i> {{ serverError }}
           </div>
           
-          <!-- <div class="mb-4 text-center">
-            <label class="d-block mb-2 font-weight-bold small">Хто ви?</label>
-            <div class="btn-group w-100" style="max-width: 400px;">
-              <input type="radio" class="btn-check" name="role" id="roleTenant" value="tenant" v-model="form.role">
-              <label class="btn btn-outline-success" for="roleTenant">Шукаю житло</label>
-
-              <input type="radio" class="btn-check" name="role" id="roleLandlord" value="owner" v-model="form.role">
-              <label class="btn btn-outline-success" for="roleLandlord">Здаю житло</label>
-            </div>
-          </div> -->
+      
 
           <div class="row mb-3">
             <div class="col-md-6">
@@ -59,7 +50,7 @@
             <input v-model="form.email" type="email" class="form-control" placeholder="name@example.com" required>
           </div>
 
-          <div v-if="form.role === 'tenant'" class="mb-3 p-3 bg-light rounded border">
+          <div  class="mb-3 p-3 bg-light rounded border">
             <label class="form-label small font-weight-bold text-primary">Серія та номер паспорта (або ID-картки)</label>
             <input v-model="form.idCardSeries" type="text" class="form-control" placeholder="Напр. 123456789 або АВ123456" required>
             <div class="form-text small text-muted">Ці дані потрібні для безпеки та перевірки особи.</div>
@@ -111,7 +102,6 @@ const router = useRouter()
 
 // 1. ДОДАЛИ phone та birthDate у початковий стан форми
 const form = ref({
-  role: 'tenant',
   firstName: '',
   lastName: '',
   phone: '',       // Нове поле
@@ -139,14 +129,14 @@ const handleRegister = async () => {
   try {
     // 2. ДОДАЛИ нові поля у payload (те, що відправляється на бекенд у форматі JSON)
     const payload = {
-      role: form.value.role,
+      role: 'client',
       name: form.value.firstName,
       surname: form.value.lastName,
       phone_number: form.value.phone,           // Додано
-      birthDate: form.value.birthDate,   // Додано
+      date_of_birth: form.value.birthDate,   // Додано
       email: form.value.email,
       password: form.value.password,
-      id_card_series: form.value.role === 'tenant' ? form.value.idCardSeries : null
+      id_card_series: form.value.idCardSeries 
     }
 
     // Відправка POST запиту
