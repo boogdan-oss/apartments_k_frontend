@@ -61,6 +61,29 @@
                 </select>
               </div>
 
+              <div class="form-group">
+                 <label class="font-weight-bold small">ціна житла</label>
+                <label class="font-weight-bold small">від</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                  </div>
+                  <input v-model="priceFrom" type="text" class="form-control border-left-0 pl-0"
+                    placeholder="1000">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="font-weight-bold small">до</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                  </div>
+                  <input v-model="priceTo" type="text" class="form-control border-left-0 pl-0"
+                    placeholder="100000">
+                </div>
+              </div>
+
               <button class="btn btn-outline-danger btn-block mt-4" @click="resetFilters">Скинути фільтри</button>
             </div>
           </div>
@@ -214,7 +237,12 @@ const openModal = (property) => {
   selectedProperty.value = property
   isModalOpen.value = true
 }
+const priceFilter =computed(()=>{
 
+
+
+}
+)
 //-----------------------------------------------------------------
 const favoriteIds = ref([])
 

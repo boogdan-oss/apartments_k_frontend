@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- БЛОК 2: МОЇ ВПОДОБАННЯ (БАЧАТЬ ВСІ: І ОРЕНДАРІ, І ВЛАСНИКИ) -->
+   
     <div>
         <h3 class="mb-3"><i class="fas fa-heart text-danger"></i> Мої уподобані квартири</h3>
 
@@ -65,8 +65,8 @@
                         <router-link :to="`/listing/${apartment.id}`"
                             class="btn btn-primary btn-sm">Переглянути</router-link>
                         <!-- Кнопка видалення з улюблених -->
-                        <button @click="removeFromFavorites(apartment.id)" class="btn btn-outline-danger btn-sm ms-2">
-                            <i class="fas fa-trash"></i>
+                        <button @click="removeFromFavorites(apartment.id)" class="btn btn-danger btn-sm ">
+                            Видалити
                         </button>
                     </div>
                 </div>
@@ -87,14 +87,12 @@ import { useAuthStore } from '../stores/authStore'
 
 const authStore = useAuthStore()
 
-// Тепер у нас два окремі масиви!
+
 const myListings = ref([]) 
 const myFavorites = ref([]) 
 const isLoading = ref(true)
 
-// ==========================================
-// Функція видалення СВОГО оголошення (Тільки для власника)
-// ==========================================
+
 const deleteListing = async (id) => {
   const isConfirmed = confirm("Ви впевнені, що хочете назавжди видалити це оголошення?");
   if (!isConfirmed) return; 
@@ -110,9 +108,7 @@ const deleteListing = async (id) => {
   }
 }
 
-// ==========================================
-// Функція видалення з УЛЮБЛЕНИХ (Для всіх)
-// ==========================================
+
 const removeFromFavorites = async (id) => {
     try {
         // Замініть цей URL на той, який у вас на бекенді для видалення з улюблених
@@ -127,9 +123,7 @@ const removeFromFavorites = async (id) => {
     }
 }
 
-// ==========================================
-// Завантаження даних при відкритті профілю
-// ==========================================
+
 onMounted(async () => {
     if (!authStore.user) return
 

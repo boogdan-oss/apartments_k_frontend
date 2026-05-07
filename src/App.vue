@@ -54,7 +54,7 @@
       <div class="container">
         <div class="row text-center">
  
-          <div class="col-md-4 mb-3 mb-md-0">
+          <div class="col-md-4 mb-3 mb-0">
             <h6 class="fw-bold"><i class="fas fa-home text-success"></i> ТвійДім</h6>
             <p class="text small mt-2">Ваш надійний партнер у пошуку ідеального житла для оренди по всій Україні.</p>
             <router-link to="/terms" class="text small text-decoration-none">
