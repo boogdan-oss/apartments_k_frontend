@@ -61,7 +61,45 @@
                 </select>
               </div>
 
+              <div class="form-group">
+                 <label class="font-weight-bold small pb-2">ціна житла</label>
+               <br>
+                <label class="font-weight-bold small">від</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                  </div>
+                  <input v-model="priceFrom" type="number" class="form-control border-left-0 pl-0"
+                    placeholder="1000">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="font-weight-bold small">до</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                  </div>
+                  <input v-model="priceTo" type="number" class="form-control border-left-0 pl-0"
+                    placeholder="100000">
+                </div>
+              </div>
+
               <button class="btn btn-outline-danger btn-block mt-4" @click="resetFilters">Скинути фільтри</button>
+
+<div class="form-group mt-3">
+  <label class="font-weight-bold small">
+    <i class="fas fa-search me-1"></i> Пошук по опису
+  </label>
+  <input 
+    v-model="searchDescription" 
+    type="text" 
+    class="form-control" 
+    placeholder="Напр. газова плита, укриття, паркінг...">
+  <small class="text-muted">Шукає слова в описі оголошення</small>
+</div>
+
+
             </div>
           </div>
         </div>
@@ -147,13 +185,14 @@ const store = usePropertyStore()
 
 const searchCity = ref('')
 const searchType = ref('')
+const searchDescription = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 6
 
 const isModalOpen = ref(false)
 const selectedProperty = ref(null)
-const userName = ref('')
-const userPhone = ref('')
+const priceFrom = ref(null)
+const priceTo = ref(null)
 
 // 3. ЗАВАНТАЖУЄМО ДАНІ ПРИ СТАРТІ СТОРІНКИ
 onMounted(async () => {
@@ -169,7 +208,7 @@ onMounted(async () => {
 })
 
 // 4. Скидаємо сторінку на 1-шу, якщо користувач почав щось шукати (замість того, щоб робити це в computed)
-watch([searchCity, searchType], () => {
+watch([searchCity, searchType,priceTo,priceFrom,searchDescription], () => {
   currentPage.value = 1
 })
 
@@ -187,7 +226,21 @@ const filteredListings = computed(() => {
       searchType.value === 'Будь-який тип' ||
       item.type === searchType.value
 
-    return matchCity && matchType
+
+      const matchDescription = searchDescription.value === '' ||
+  (item.description && 
+   item.description.toLowerCase().includes(searchDescription.value.toLowerCase()))
+
+
+
+
+    const matchPriceFrom = !priceFrom.value || item.price >= priceFrom.value
+
+    // Фільтр по ціні "ДО"
+    const matchPriceTo = !priceTo.value || item.price <= priceTo.value
+
+    return matchCity && matchType && matchPriceFrom && matchPriceTo&&matchDescription
+    
   })
 })
 
@@ -204,6 +257,9 @@ const totalPages = computed(() => {
 const resetFilters = () => {
   searchCity.value = ''
   searchType.value = ''
+  priceTo.value=''
+  priceFrom.value=''
+  searchDescription=''
 }
 
 const scrollToCatalog = () => {
@@ -214,7 +270,12 @@ const openModal = (property) => {
   selectedProperty.value = property
   isModalOpen.value = true
 }
+const priceFilter =computed(()=>{
 
+
+
+}
+)
 //-----------------------------------------------------------------
 const favoriteIds = ref([])
 

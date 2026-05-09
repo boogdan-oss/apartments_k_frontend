@@ -1,50 +1,79 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
-      <router-link to="/" class="navbar-brand"><i class="fas fa-home text-success"></i> ТвійДім</router-link>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div v-if="authStore.isAuthenticated && authStore.user" class="d-flex align-items-center me-3 text-light">
-        <i class="fas fa-user-circle fa-lg me-2"></i> <span class="font-weight-bold">
-          {{ authStore.user.name }} {{ authStore.user.surname }}
-        </span>
-      </div>
-      <div class="d-flex align-items-center gap-3 ms-auto">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top main-nav">
+      <div class="container">
+        <!-- Логотип -->
+        <router-link to="/" class="navbar-brand d-flex align-items-center">
+          <i class="fas fa-home text-success me-2 fs-3"></i>
+          <span class="fw-bold tracking-tight">Твій<span class="text-success">Дім</span></span>
+        </router-link>
 
-        <template v-if="!authStore.isAuthenticated">
-          <router-link to="/login" class="nav-link text-success">Увійти</router-link>
-          <router-link to="/register" class="btn btn-success auth-btn">Реєстрація</router-link>
-        </template>
-        <button @click="authStore.logout()" class="btn btn-outline-danger btn-sm">
-          Вийти
+        <!-- Кнопка мобільного меню -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
         </button>
 
-        <router-link v-if="authStore.isAuthenticated " to="/profile"
-          class="nav-link text-primary fw-bold me-3 d-flex align-items-center">
-          <i class="fas fa-user-circle fs-5 me-1"></i>
-          <span>Профіль ({{ authStore.user?.name }})</span>
-        </router-link>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- Ліва частина (Основні посилання) -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <router-link to="/" class="nav-link" active-class="active">Головна</router-link>
+            </li>
+            <li v-if="authStore.isAuthenticated" class="nav-item">
+              <router-link to="/add-listing" class="nav-link text-warning fw-medium">
+                <i class="fas fa-plus-circle me-1"></i>Розмістити оголошення
+              </router-link>
+            </li>
+          </ul>
 
-        <template>
-          <div v-if="authStore.user" class="text-light">
-            <i class="fas fa-user-circle me-1"></i>
+          <!-- Права частина (Авторизація / Профіль) -->
+          <div class="d-flex align-items-center gap-2">
+            
+            <!-- Якщо НЕ авторизований -->
+            <template v-if="!authStore.isAuthenticated">
+              <router-link to="/login" class="btn btn-link text-light text-decoration-none">Увійти</router-link>
+              <router-link to="/register" class="btn btn-success px-4 rounded-pill shadow-sm">Реєстрація</router-link>
+            </template>
+
+            <!-- Якщо авторизований -->
+            <template v-else>
+              <!-- Адмін панель окремою кнопкою -->
+              <a v-if="authStore.user?.role === 'admin'" 
+                 href="http://localhost:8000/admin" 
+                 target="_blank"
+                 class="btn btn-outline-danger btn-sm me-2">
+                <i class="fas fa-lock me-1"></i> Адмін
+              </a>
+
+              <!-- Випадаюче меню профілю -->
+              <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3" 
+                        type="button" 
+                        id="userMenu" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                  <i class="fas fa-user-circle fs-5"></i>
+                  <span>{{ authStore.user?.name || 'Профіль' }}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg mt-2 border-0" aria-labelledby="userMenu">
+                  <li>
+                    <router-link class="dropdown-item py-2" to="/profile">
+                      <i class="fas fa-id-card me-2 text-muted"></i>Мій профіль
+                    </router-link>
+                  </li>
+                 
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <button @click="authStore.logout()" class="dropdown-item py-2 text-danger">
+                      <i class="fas fa-sign-out-alt me-2"></i>Вийти
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </template>
+
           </div>
-          <button v-if="authStore.isAuthenticated" @click="authStore.logout()" class="btn btn-outline-danger btn-sm">
-            Вийти
-          </button>
-        </template>
-
-        <router-link v-if="authStore.isAuthenticated " to="/add-listing"
-          class="nav-link text-warning font-weight-bold">
-          Розмістити оголошення
-        </router-link>
-        
-        <a v-if="authStore.user?.role === 'admin'" href="http://localhost:8000/admin" target="_blank"
-          class="nav-link text-danger fw-bold me-3">
-          <i class="fas fa-database"></i> адмін панель (SQLAdmin)
-        </a>
-
+        </div>
       </div>
     </nav>
 
@@ -54,7 +83,7 @@
       <div class="container">
         <div class="row text-center">
  
-          <div class="col-md-4 mb-3 mb-md-0">
+          <div class="col-md-4 mb-3 mb-0">
             <h6 class="fw-bold"><i class="fas fa-home text-success"></i> ТвійДім</h6>
             <p class="text small mt-2">Ваш надійний партнер у пошуку ідеального житла для оренди по всій Україні.</p>
             <router-link to="/terms" class="text small text-decoration-none">

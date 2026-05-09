@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- БЛОК 2: МОЇ ВПОДОБАННЯ (БАЧАТЬ ВСІ: І ОРЕНДАРІ, І ВЛАСНИКИ) -->
+   
     <div>
         <h3 class="mb-3"><i class="fas fa-heart text-danger"></i> Мої уподобані квартири</h3>
 
@@ -62,11 +62,14 @@
                         <h6 class="text-success">{{ apartment.price }} грн</h6>
                     </div>
                     <div class="card-footer bg-white text-center">
-                        <router-link :to="`/listing/${apartment.id}`"
-                            class="btn btn-primary btn-sm">Переглянути</router-link>
+                        <!-- <router-link :to="`/listing/${apartment.id}`"
+                            class="btn btn-primary btn-sm">Переглянути</router-link> -->
+                             <button @click="goToFavorites(apartment.id)" class="btn btn-primary btn-sm ">
+                            Переглянути
+                        </button>
                         <!-- Кнопка видалення з улюблених -->
-                        <button @click="removeFromFavorites(apartment.id)" class="btn btn-outline-danger btn-sm ms-2">
-                            <i class="fas fa-trash"></i>
+                        <button @click="removeFromFavorites(apartment.id)" class="btn btn-danger btn-sm ">
+                            Видалити
                         </button>
                     </div>
                 </div>
@@ -84,23 +87,22 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 
-// Тепер у нас два окремі масиви!
+
 const myListings = ref([]) 
 const myFavorites = ref([]) 
 const isLoading = ref(true)
+const router = useRouter()
 
-// ==========================================
-// Функція видалення СВОГО оголошення (Тільки для власника)
-// ==========================================
 const deleteListing = async (id) => {
   const isConfirmed = confirm("Ви впевнені, що хочете назавжди видалити це оголошення?");
   if (!isConfirmed) return; 
 
   try {
-    await axios.delete(`http://localhost:8000/api/apartments/listing/${id}`, {
+    await axios.delete(`http://localhost:8000/api/apartments/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     myListings.value = myListings.value.filter(apt => apt.id !== id);
@@ -110,9 +112,7 @@ const deleteListing = async (id) => {
   }
 }
 
-// ==========================================
-// Функція видалення з УЛЮБЛЕНИХ (Для всіх)
-// ==========================================
+
 const removeFromFavorites = async (id) => {
     try {
         // Замініть цей URL на той, який у вас на бекенді для видалення з улюблених
@@ -127,9 +127,14 @@ const removeFromFavorites = async (id) => {
     }
 }
 
-// ==========================================
-// Завантаження даних при відкритті профілю
-// ==========================================
+
+const goToFavorites = (apartmentId) => {
+  if (!apartmentId) return;
+  
+  // Перекидаємо користувача на той самий URL, який використовує кнопка "Деталі"
+  router.push(`/apartments/listing/${apartmentId}`)
+}
+
 onMounted(async () => {
     if (!authStore.user) return
 

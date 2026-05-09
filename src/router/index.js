@@ -58,7 +58,14 @@ const router = createRouter({
     path: '/terms',
     name: 'Terms',
     component: TermsPage
-  }
+  },
+  {
+  
+  // Шлях має точно збігатися з тим, куди ви переходите
+  path: '/apartments/listing/:id', 
+  name: 'ApartmentDetails',
+  component: () => import('../views/Details.vue')
+}
   ],
 });
 
