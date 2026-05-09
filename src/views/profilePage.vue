@@ -62,8 +62,11 @@
                         <h6 class="text-success">{{ apartment.price }} грн</h6>
                     </div>
                     <div class="card-footer bg-white text-center">
-                        <router-link :to="`/listing/${apartment.id}`"
-                            class="btn btn-primary btn-sm">Переглянути</router-link>
+                        <!-- <router-link :to="`/listing/${apartment.id}`"
+                            class="btn btn-primary btn-sm">Переглянути</router-link> -->
+                             <button @click="goToFavorites(apartment.id)" class="btn btn-primary btn-sm ">
+                            Переглянути
+                        </button>
                         <!-- Кнопка видалення з улюблених -->
                         <button @click="removeFromFavorites(apartment.id)" class="btn btn-danger btn-sm ">
                             Видалити
@@ -84,6 +87,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 
@@ -91,14 +95,14 @@ const authStore = useAuthStore()
 const myListings = ref([]) 
 const myFavorites = ref([]) 
 const isLoading = ref(true)
-
+const router = useRouter()
 
 const deleteListing = async (id) => {
   const isConfirmed = confirm("Ви впевнені, що хочете назавжди видалити це оголошення?");
   if (!isConfirmed) return; 
 
   try {
-    await axios.delete(`http://localhost:8000/api/apartments/listing/${id}`, {
+    await axios.delete(`http://localhost:8000/api/apartments/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     });
     myListings.value = myListings.value.filter(apt => apt.id !== id);
@@ -123,6 +127,13 @@ const removeFromFavorites = async (id) => {
     }
 }
 
+
+const goToFavorites = (apartmentId) => {
+  if (!apartmentId) return;
+  
+  // Перекидаємо користувача на той самий URL, який використовує кнопка "Деталі"
+  router.push(`/apartments/listing/${apartmentId}`)
+}
 
 onMounted(async () => {
     if (!authStore.user) return
